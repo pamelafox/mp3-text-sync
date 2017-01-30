@@ -1,0 +1,212 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>mp3-text-sync: JavaScript Audio Sync With Text</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="description" content="JavaScript Audio Sync With Text - Demo">
+<style>
+body {
+  font-family: monospace;
+}
+#header {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+}
+
+#modes {
+  position: fixed;
+  right: 5px;
+  width: 200px;
+}
+
+#header audio {
+  width: 100%;
+}
+
+#content {
+  margin-top: 5px;
+  padding-bottom: 800px;
+}
+
+#buttons {
+  margin-bottom: 10px;
+}
+
+tr.highlighted {
+  font-weight: bold;
+}
+
+td:first-child {
+  max-width: 300px;
+  overflow: hidden;
+}
+
+td[contenteditable] {
+  width: 100px;
+  background: #ccc;
+  color: black;
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <audio id="audiofile" src="part4.mp3" controls></audio>
+</div>
+
+<div id="content">
+  <div id="buttons">
+   <fieldset id="modes">
+    <legend>Options</legend>
+    <label><input type="checkbox" name="mode" value="click4time"/>Click-for-timestamp</label>
+    <br/>
+    <label><input type="checkbox" name="mode" value="halfspeed"/>Half speed</label>
+    <br/>
+    <label><input type="checkbox" name="mode" value="hidetimes"/>Hide times</label>
+   </fieldset>
+  </div>
+  
+  <table id="lyrics">
+   <thead> 
+     <tr><th>text<th>start<th>end</tr>
+  </table>
+</div>
+ 
+  <script>
+      var textTimes = [];
+      var audioPlayer = document.getElementById("audiofile");
+      var textTable = document.getElementById("lyrics");
+      var clickForTime = false, hideTimes = false; 
+
+      function getTimesFromTable(table) {
+        var times = [];  
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            times.push({dom: row.cells[0], start: row.cells[1].innerText, end: row.cells[2].innerText});
+        }
+        return times;
+      }
+
+      function toggleTimes(table, doShow) {
+        for (var i = 0, row; row = table.rows[i]; i++) {
+          row.cells[1].style.display = doShow ? 'table-cell' : 'none';
+          row.cells[2].style.display = doShow ? 'table-cell' : 'none';
+        }
+      } 
+
+      function fillTableFromTimes(table, times) {
+        var tBody = document.createElement("tbody");
+        for (var i = 0; i < times.length; i++) {
+          var tRow = document.createElement("tr");
+          var tD = document.createElement("td");
+          tD.innerHTML = times[i].text;
+          tRow.appendChild(tD);
+          var tD = document.createElement("td");
+          tD.innerHTML = times[i].start;
+          tD.classList.add("start");
+          tD.setAttribute("contenteditable", "");
+          tRow.appendChild(tD);
+          var tD = document.createElement("td");
+          tD.classList.add("end");
+          tD.setAttribute("contenteditable", "");
+          tD.innerHTML = times[i].end;
+          tRow.appendChild(tD);
+          tBody.appendChild(tRow);
+          times[i].dom = tRow;
+        }    
+        table.appendChild(tBody);
+      }
+
+      audioPlayer.addEventListener("timeupdate", function(e){
+          if (audioPlayer.currentTime === 0) {
+            window.scrollTo(0, 0);
+            return;
+          }
+          var foundNewHighlight = null;
+          textTimes.forEach(function(element, index, array){
+              if(audioPlayer.currentTime >= element.start && audioPlayer.currentTime <= element.end ) {
+                  element.dom.classList.add("highlighted");
+                  element.dom.scrollIntoView(true);
+                  foundNewHighlight = element.dom;
+              }
+          });
+          // Only remove highlight if we found a new one to highlight
+          if (foundNewHighlight) {
+            textTimes.forEach(function(element, index, array){
+              if (foundNewHighlight !== element.dom) {
+                element.dom.classList.remove("highlighted");
+              }
+            });
+          }
+      });
+     
+      var modes = document.querySelectorAll("#modes input"), i = modes.length;
+      while (i--) 
+        modes[i].addEventListener("change", function() {
+          if (this.value == "click4time") {
+            clickForTime = !!this.checked;
+          } else if (this.value == "hidetimes") {
+            toggleTimes(textTable, !this.checked);
+          } else if (this.value == "halfspeed") {
+            audioPlayer.playbackRate = this.checked ? 0.5 : 1.0;
+          }
+       }, 0);
+           
+
+      textTable.addEventListener("click", function(event) {
+         if (!clickForTime) return;
+         if (event.target.hasAttribute("contenteditable")) {
+           var timeToRecord = audioPlayer.currentTime;
+           if (event.target.classList.contains("start")) {
+             timeToRecord -= 0.3;
+           } else {
+             timeToRecord -= 0.1;
+           }
+           event.target.innerText = timeToRecord.toFixed(2);	   
+           window.setTimeout(function() {textTimes = getTimesFromTable(textTable);}, 10);
+         }
+      });
+
+      textTable.addEventListener("dblclick", function(event) {
+        if (event.target.hasAttribute("contenteditable")) {
+          audioPlayer.currentTime = parseFloat(event.target.textContent)
+          if (audioPlayer.paused) { audioPlayer.play(); }
+          else { audioPlayer.pause(); }
+        }
+      });
+      
+      var exportJson = function(table) {
+        var json = [];
+        for (var i = 0, row; row = table.rows[i]; i++) {
+          json.push({text: row.cells[0], start: row.cells[1], end: row.cells[2]});
+        }
+        return json;
+      }
+      
+      function fillData(data) {
+        var entries = data.feed.entry;
+        for (var i = 0; i < entries.length; i++) {
+          textTimes.push({text: entries[i]["gsx$text"].$t, start: entries[i]["gsx$start"].$t, end: entries[i]["gsx$end"].$t});
+        }
+        fillTableFromTimes(textTable, textTimes);
+      };
+      function loadAudioAndData(info) {
+        audioPlayer.src = info[0];
+        var scr = document.createElement("script");
+        scr.src = "https://spreadsheets.google.com/feeds/list/" + info[1] + "/public/values?alt=json&callback=fillData";
+        document.body.appendChild(scr);
+      }
+
+      var ursonate = {
+        "part1": ["part1.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/oayan0t"],
+        "part2": ["part2.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/on956mq"],
+        "part3": ["part3.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/o4iws61"],
+        "part4": ["part4.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/od6"]
+      };
+
+      loadAudioAndData(ursonate.part2)
+  </script>
+</body>
+</html>
+
+
