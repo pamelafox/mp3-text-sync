@@ -1,6 +1,6 @@
 # mp3-text-sync
 
-This page loads up an audio file and row-by-row text from a Google spreadsheet, and then allows you to either click to specify timestamps or manually edit timestamps. Thank you to [CodePunker](https://www.codepunker.com/blog/sync-audio-with-text-using-javascript) for the inspiration.
+This page loads up an audio file and row-by-row text from a Google spreadsheet, and then allows you to either click to specify timestamps or manually edit timestamps. Thank you to [CodePunker](https://www.codepunker.com/blog/sync-audio-with-text-using-javascript) for the inspiration. You can read more about why I made it in [this blog post](https://medium.com/@pamelafox/learning-the-ursonate-the-mind-clearing-benefits-of-non-conceptual-sound-poetry-ae90b2cf8dca#.dk9mhbv71).
 
 ![Screenshot of page](screenshot_webpage.png)
 
