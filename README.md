@@ -1,11 +1,11 @@
 # mp3-text-sync
 
 This page loads up an audio file and row-by-row text from a Google spreadsheet, and then allows you to either click to specify timestamps or manually edit timestamps.
-![Screenshot of page][screenshot_webpage.png]
+![Screenshot of page](screenshot_webpage.png)
 
 ## Setup:
 - Create the Google spreadsheet. It should have a "text" column, a "start" column, and an "end" column. Each row after that should have a line of text in the "text" column. You can often copy/paste text from the internet in such a way that it will get split over each row. (Sometimes it helps to paste into vim first, for whatever reason).
-![Screenshot of spreadsheet][screenshot_spreadsheet.png]
+![Screenshot of spreadsheet](screenshot_spreadsheet.png)
 - Specify data in the `info` object at the bottom of `index.html`. The first item is the mp3 URL and the second item is the spreadsheet_key/worksheet_id. The spreadsheet_key is in the browser window. The worksheet_id is od6 for the first worksheet. If you need the ID for other worksheets, [read this blog post](http://damolab.blogspot.com/2011/03/od6-and-finding-other-worksheet-ids.html).
 - Run [node server locally](https://github.com/indexzero/http-server). A Python simple server does not stream audio correctly, so you must use Node http-server or another server that does stream audio correctly.
 - Install this [Table Capture Chrome Extension](https://chrome.google.com/webstore/detail/table-capture/iebpjdmgckacbodjpijphcplhebcmeop)
