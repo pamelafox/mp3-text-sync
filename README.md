@@ -1,7 +1,9 @@
 # mp3-text-sync
 
-This page loads up an audio file and row-by-row text from a Google spreadsheet, and then allows you to either click to specify timestamps or manually edit timestamps.
+This page loads up an audio file and row-by-row text from a Google spreadsheet, and then allows you to either click to specify timestamps or manually edit timestamps. Thank you to [CodePunker](https://www.codepunker.com/blog/sync-audio-with-text-using-javascript) for the inspiration.
+
 ![Screenshot of page](screenshot_webpage.png)
+
 
 ## Setup:
 - Create the Google spreadsheet. It should have a "text" column, a "start" column, and an "end" column. Each row after that should have a line of text in the "text" column. You can often copy/paste text from the internet in such a way that it will get split over each row. (Sometimes it helps to paste into vim first, for whatever reason).
