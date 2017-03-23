@@ -167,6 +167,14 @@ td[contenteditable] {
          }
       });
 
+      textTable.addEventListener("input", function(event) {
+         if (clickForTime) return;
+         if (event.target.hasAttribute("contenteditable")) {
+           window.setTimeout(function() {textTimes = getTimesFromTable(textTable);}, 10);
+         }
+      });
+
+
       textTable.addEventListener("dblclick", function(event) {
         if (event.target.hasAttribute("contenteditable")) {
           audioPlayer.currentTime = parseFloat(event.target.textContent)
@@ -189,7 +197,8 @@ td[contenteditable] {
           textTimes.push({text: entries[i]["gsx$text"].$t, start: entries[i]["gsx$start"].$t, end: entries[i]["gsx$end"].$t});
         }
         fillTableFromTimes(textTable, textTimes);
-      };
+      }
+
       function loadAudioAndData(info) {
         audioPlayer.src = info[0];
         var scr = document.createElement("script");
@@ -198,13 +207,13 @@ td[contenteditable] {
       }
 
       var ursonate = {
-        "part1": ["part1.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/oayan0t"],
-        "part2": ["part2.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/on956mq"],
-        "part3": ["part3.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/o4iws61"],
-        "part4": ["part4.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/od6"]
+        "part1": ["ursonate/part1.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/oayan0t"],
+        "part2": ["ursonate/part2.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/on956mq"],
+        "part3": ["ursonate/part3.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/o4iws61"],
+        "part4": ["ursonate/part4.mp3", "1H0HUY6MBnleD7Ff_3gPYj_FpXdnxUFmFrBLl9GOuidE/od6"]
       };
 
-      loadAudioAndData(ursonate.part2)
+      loadAudioAndData(ursonate.part1);
   </script>
 </body>
 </html>
